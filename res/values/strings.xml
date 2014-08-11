@@ -10,4 +10,8 @@
     <string name="register_google">Register with Google+</string>
     <string name="facebook_app_id">796722137015397</string>
 
+    <!-- Button text -->
+    <string name="btn_logout_from_google">Logout from Google</string>
+    <string name="btn_revoke_access">Revoke Access</string>
+
 </resources>

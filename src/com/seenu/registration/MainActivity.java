@@ -19,6 +19,7 @@ import android.widget.TextView;
 public class MainActivity extends ActionBarActivity {
 
 	private Button fb_bt;
+	private Button gp_bt;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +27,7 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main);
 
 		fb_bt = (Button) findViewById(R.id.button2);
+		gp_bt = (Button) findViewById(R.id.button4);
 
 		fb_bt.setOnClickListener(new OnClickListener() {
 
@@ -34,6 +36,16 @@ public class MainActivity extends ActionBarActivity {
 				// TODO Auto-generated method stub
 
 				Intent i = new Intent(MainActivity.this, FacebookLogin.class);
+				startActivity(i);
+			}
+		});
+
+		gp_bt.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent i = new Intent(MainActivity.this, GooglePlusLogin.class);
 				startActivity(i);
 			}
 		});
