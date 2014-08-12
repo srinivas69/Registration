@@ -1,9 +1,10 @@
 package com.seenu.registration;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 
-public class FacebookLogin extends ActionBarActivity {
+public class FacebookLogin extends FragmentActivity {
 
 	private FacebookLoginFragment fbFragment;
 

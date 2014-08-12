@@ -43,6 +43,7 @@
         <activity android:name="GooglePlusLogin"></activity>
         <activity android:name="TwitterLogin"></activity>
         <activity android:name="LoginToTwitter"></activity>
+        <activity android:name="HomeScreenActivity"></activity>
     </application>
 
 </manifest>
