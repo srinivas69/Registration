@@ -20,6 +20,7 @@ public class MainActivity extends ActionBarActivity {
 
 	private Button fb_bt;
 	private Button gp_bt;
+	private Button tw_bt;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,7 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main);
 
 		fb_bt = (Button) findViewById(R.id.button2);
+		tw_bt = (Button) findViewById(R.id.button3);
 		gp_bt = (Button) findViewById(R.id.button4);
 
 		fb_bt.setOnClickListener(new OnClickListener() {
@@ -46,6 +48,16 @@ public class MainActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent i = new Intent(MainActivity.this, GooglePlusLogin.class);
+				startActivity(i);
+			}
+		});
+
+		tw_bt.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent i = new Intent(MainActivity.this, TwitterLogin.class);
 				startActivity(i);
 			}
 		});

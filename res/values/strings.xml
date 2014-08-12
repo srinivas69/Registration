@@ -13,5 +13,10 @@
     <!-- Button text -->
     <string name="btn_logout_from_google">Logout from Google</string>
     <string name="btn_revoke_access">Revoke Access</string>
+    <!-- <string name="TWITTER_CONSUMER_KEY">Uw6ZRc6Qys8WDyEepZ2GDbaAI</string>
+    <string name="TWITTER_CONSUMER_SECRET">43wEcCtuHat6B3KSjBrpeetyVxRM2EKXu8UXTCE38xEZPjPSYF</string>
+    <string name="TWITTER_CALLBACK_URL">oauth://twitter_callback</string> -->
+    
+    <!-- <string name="TWITTER_CALLBACK_URL">http://com.seenu.registration</string> -->
 
 </resources>
