@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.facebook.Request;
@@ -31,6 +33,8 @@ public class FacebookLoginFragment extends Fragment {
 	private UiLifecycleHelper uiHelper;
 
 	private TextView userInfoTextView;
+
+	private Button logoutBt;
 
 	private Session.StatusCallback callback = new Session.StatusCallback() {
 
@@ -52,8 +56,9 @@ public class FacebookLoginFragment extends Fragment {
 		LoginButton authButton = (LoginButton) view
 				.findViewById(R.id.authButton);
 		userInfoTextView = (TextView) view.findViewById(R.id.userInfoTextView);
+		logoutBt = (Button) view.findViewById(R.id.button1);
 		authButton.setFragment(this);
-		authButton.setReadPermissions(Arrays.asList("user_location",
+		authButton.setReadPermissions(Arrays.asList("email ","public_profile","user_location",
 				"user_birthday", "user_likes"));
 		return view;
 	}
@@ -63,6 +68,19 @@ public class FacebookLoginFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 
+		logoutBt.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+				if (Session.getActiveSession() != null) {
+					Session.getActiveSession().closeAndClearTokenInformation();
+				}
+
+				Session.setActiveSession(null);
+			}
+		});
 	}
 
 	@Override
@@ -129,7 +147,7 @@ public class FacebookLoginFragment extends Fragment {
 					if (user != null) {
 						// Display the parsed user info
 						userInfoTextView.setText(buildUserInfoDisplay(user));
-						// System.out.println(user.toString());
+						System.out.println(user.toString());
 					}
 				}
 			}).executeAsync();
