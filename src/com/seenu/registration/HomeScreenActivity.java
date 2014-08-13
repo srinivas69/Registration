@@ -1,6 +1,7 @@
 package com.seenu.registration;
 
 import com.facebook.Session;
+import com.google.android.gms.plus.Plus;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -34,13 +35,30 @@ public class HomeScreenActivity extends ActionBarActivity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				/*
+				 * if (Session.getActiveSession() != null) {
+				 * Session.getActiveSession().closeAndClearTokenInformation(); }
+				 * Session.setActiveSession(null); finish();
+				 */
 
-				if (Session.getActiveSession() != null) {
-					Session.getActiveSession().closeAndClearTokenInformation();
+				if (MainActivity.mGoogleApiClient.isConnected()) {
+					Plus.AccountApi
+							.clearDefaultAccount(MainActivity.mGoogleApiClient);
+					MainActivity.mGoogleApiClient.disconnect();
+					MainActivity.mGoogleApiClient.connect();
+					finish();
 				}
-				Session.setActiveSession(null);
-				finish();
+				
+
 			}
 		});
+	}
+
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+
+		MainActivity.mGoogleApiClient.connect();
 	}
 }

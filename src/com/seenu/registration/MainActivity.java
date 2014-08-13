@@ -6,6 +6,13 @@ import java.util.Arrays;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.User;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
+
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
@@ -22,7 +29,11 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,10 +49,17 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity implements OnClickListener,
 		ConnectionCallbacks, OnConnectionFailedListener {
 
+	private ProgressDialog pDia;
+
 	// Google client to interact with Google API
-	private GoogleApiClient mGoogleApiClient;
+	public static GoogleApiClient mGoogleApiClient;
 
 	private static final int RC_SIGN_IN = 0;
+
+	private static Twitter twitter;
+
+	protected static final String AUTHENTICATION_URL_KEY = "AUTHENTICATION_URL_KEY";
+	protected static final int LOGIN_TO_TWITTER_REQUEST = 1;
 
 	/**
 	 * A flag indicating that a PendingIntent is in progress and prevents us
@@ -53,6 +71,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 	private ConnectionResult mConnectionResult;
 
+	private Button reg_bt;
 	private Button tw_bt;
 	private SignInButton googleSignIn;
 	private LoginButton fbAuthButton;
@@ -89,6 +108,10 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 		if (shPrfs.contains(LOGIN_STATUS)) {
 			if (shPrfs.getBoolean(LOGIN_STATUS, false)) {
+
+				if (shPrfs.getString(LOGIN_TYPE, "none").equals("gplus")) {
+					return;
+				}
 				Intent i = new Intent(MainActivity.this,
 						HomeScreenActivity.class);
 				startActivity(i);
@@ -101,6 +124,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 		setContentView(R.layout.activity_main);
 
+		reg_bt = (Button) findViewById(R.id.button1);
 		fbAuthButton = (LoginButton) findViewById(R.id.button2);
 
 		// fb_bt = (Button) findViewById(R.id.button2);
@@ -108,6 +132,9 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		// gp_bt = (Button) findViewById(R.id.button4);
 		googleSignIn = (SignInButton) findViewById(R.id.button4);
 
+		pDia = new ProgressDialog(MainActivity.this);
+
+		reg_bt.setOnClickListener(this);
 		// fb_bt.setOnClickListener(this);
 		tw_bt.setOnClickListener(this);
 		googleSignIn.setOnClickListener(this);
@@ -144,6 +171,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 	public void onDestroy() {
 		super.onDestroy();
 		uiHelper.onDestroy();
+
 	}
 
 	@Override
@@ -161,6 +189,44 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		uiHelper.onSaveInstanceState(outState);
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+
+		switch (v.getId()) {
+
+		case R.id.button1:
+
+			Intent i = new Intent(MainActivity.this, RegisterActivity.class);
+			startActivity(i);
+
+			break;
+
+		case R.id.button3:
+
+			loginToTwitter();
+			/*
+			 * Intent i2 = new Intent(MainActivity.this, TwitterLogin.class);
+			 * startActivity(i2);
+			 */
+
+			break;
+
+		case R.id.button4:
+
+			// Signin button clicked
+
+			new SingInGPlusAsync().execute();
+			// signInWithGplus();
+
+			break;
+
+		default:
+			break;
+		}
+
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -225,32 +291,13 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 				mGoogleApiClient.connect();
 			}
 			break;
-		}
 
-	}
-
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-
-		switch (v.getId()) {
-
-		case R.id.button3:
-
-			Intent i2 = new Intent(MainActivity.this, TwitterLogin.class);
-			startActivity(i2);
-
-			break;
-
-		case R.id.button4:
-
-			// Signin button clicked
-			signInWithGplus();
-
-			break;
-
-		default:
-			break;
+		case LOGIN_TO_TWITTER_REQUEST:
+			if (resultCode == Activity.RESULT_OK) {
+				getAccessToken(data
+						.getStringExtra(LoginToTwitter.CALLBACK_URL_KEY));
+				break;
+			}
 		}
 
 	}
@@ -296,7 +343,12 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
 
 		// Get user's information
-		getProfileInformation();
+		String userDetails = getProfileInformation();
+
+		/*
+		 * Intent i = new Intent(MainActivity.this, HomeScreenActivity.class);
+		 * i.putExtra("UserDetails", userDetails); startActivity(i); finish();
+		 */
 	}
 
 	@Override
@@ -351,6 +403,28 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		}
 	}
 
+	private void loginToTwitter() {
+		// TODO Auto-generated method stub
+		GetRequestTokenTask getRequestTokenTask = new GetRequestTokenTask();
+		getRequestTokenTask.execute();
+	}
+
+	public void launchLoginWebView(RequestToken requestToken) {
+		// TODO Auto-generated method stub
+		Intent intent = new Intent(this, LoginToTwitter.class);
+		intent.putExtra(AUTHENTICATION_URL_KEY,
+				requestToken.getAuthenticationURL());
+		startActivityForResult(intent, LOGIN_TO_TWITTER_REQUEST);
+	}
+
+	private void getAccessToken(String callbackUrl) {
+		Uri uri = Uri.parse(callbackUrl);
+		String verifier = uri.getQueryParameter("oauth_verifier");
+
+		GetAccessTokenTask getAccessTokenTask = new GetAccessTokenTask();
+		getAccessTokenTask.execute(verifier);
+	}
+
 	protected String buildUserInfoDisplay(GraphUser user) {
 		// TODO Auto-generated method stub
 
@@ -383,19 +457,31 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		return userInfo.toString();
 	}
 
-	private void getProfileInformation() {
+	private String getProfileInformation() {
 		// TODO Auto-generated method stub
+
+		StringBuilder userInfo = new StringBuilder("");
 
 		try {
 			if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
+
 				Person currentPerson = Plus.PeopleApi
 						.getCurrentPerson(mGoogleApiClient);
 				String personName = currentPerson.getDisplayName();
+
+				userInfo.append(String.format("Name: %s\n\n", personName));
+
 				String personPhotoUrl = currentPerson.getImage().getUrl();
 				String personGooglePlusProfile = currentPerson.getUrl();
+
 				String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
+				userInfo.append(String.format("UserName: %s\n\n", email));
+
 				String dob = currentPerson.getBirthday();
+				userInfo.append(String.format("DOB: %s\n\n", dob));
+
 				String gender = String.valueOf(currentPerson.getGender());
+				userInfo.append(String.format("Gender: %s\n\n", gender));
 
 				Log.e(TAG, "Name: " + personName + ", plusProfile: "
 						+ personGooglePlusProfile + ", email: " + email
@@ -408,6 +494,104 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		return userInfo.toString();
+	}
+
+	private class SingInGPlusAsync extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+
+			pDia.setTitle("Logging In");
+			pDia.setMessage("Please wait...");
+			pDia.show();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			signInWithGplus();
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			pDia.dismiss();
+		}
+
+	}
+
+	private class GetRequestTokenTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... voids) {
+			twitter = TwitterFactory.getSingleton();
+			/*
+			 * System.out.println("TWITTER_CONSUMER_KEY: " +
+			 * getString(R.string.TWITTER_CONSUMER_KEY) +
+			 * ", TWITTER_CONSUMER_SECRET: " +
+			 * getString(R.string.TWITTER_CONSUMER_SECRET));
+			 */
+			twitter.setOAuthConsumer(getString(R.string.TWITTER_CONSUMER_KEY),
+					getString(R.string.TWITTER_CONSUMER_SECRET));
+
+			try {
+				RequestToken requestToken = twitter
+						.getOAuthRequestToken(getString(R.string.TWITTER_CALLBACK_URL));
+				launchLoginWebView(requestToken);
+			} catch (TwitterException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+
+	private class GetAccessTokenTask extends AsyncTask<String, Void, Void> {
+
+		@Override
+		protected Void doInBackground(String... strings) {
+			String verifier = strings[0];
+			try {
+				AccessToken accessToken = twitter.getOAuthAccessToken(verifier);
+				Log.d(MainActivity.class.getSimpleName(),
+						accessToken.getToken());
+
+				long userID = accessToken.getUserId();
+
+				User user = twitter.showUser(userID);
+
+				StringBuilder userInfo = new StringBuilder("");
+
+				String userName = user.getName();
+				userInfo.append(String.format("Name: %s\n\n", userName));
+
+				String userId = user.getScreenName();
+				userInfo.append(String.format("AccountName: %s\n\n", userId));
+
+				String location = user.getLocation();
+				userInfo.append(String.format("Location: %s\n\n", location));
+
+				System.out.println(userName);
+				System.out.println(userId);
+
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+
+					}
+				});
+
+			} catch (Exception e) {
+
+			}
+			return null;
 		}
 	}
 
