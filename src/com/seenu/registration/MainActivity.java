@@ -12,6 +12,8 @@ import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -38,6 +40,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.IntentSender.SendIntentException;
+import android.content.SharedPreferences.Editor;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -86,6 +89,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 	AlertDialogManager alert = new AlertDialogManager();
 
 	private SharedPreferences shPrfs;
+	private Editor edit;
 	public static String PREFERENCE_NAME = "MyPrefs";
 	public static String LOGIN_STATUS = "loginStatus";
 	public static String LOGIN_TYPE = "loginType";
@@ -105,6 +109,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		super.onCreate(savedInstanceState);
 
 		shPrfs = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
+		edit = shPrfs.edit();
 
 		if (shPrfs.contains(LOGIN_STATUS)) {
 			if (shPrfs.getBoolean(LOGIN_STATUS, false)) {
@@ -270,6 +275,24 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 											HomeScreenActivity.class);
 									i.putExtra("UserDetails", userDetails);
 									startActivity(i);
+
+									if (shPrfs
+											.contains(MainActivity.LOGIN_STATUS)) {
+										edit.remove(MainActivity.LOGIN_STATUS);
+										edit.remove(MainActivity.LOGIN_TYPE);
+										edit.putBoolean(
+												MainActivity.LOGIN_STATUS, true);
+										edit.putString(MainActivity.LOGIN_TYPE,
+												"facebook");
+										edit.commit();
+									} else {
+										edit.putBoolean(
+												MainActivity.LOGIN_STATUS, true);
+										edit.putString(MainActivity.LOGIN_TYPE,
+												"facebook");
+										edit.commit();
+									}
+
 									finish();
 								}
 							}
@@ -530,15 +553,23 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 		@Override
 		protected Void doInBackground(Void... voids) {
-			twitter = TwitterFactory.getSingleton();
+			
+			ConfigurationBuilder builder = new ConfigurationBuilder();
+			builder.setOAuthConsumerKey(getString(R.string.TWITTER_CONSUMER_KEY));
+			builder.setOAuthConsumerSecret(getString(R.string.TWITTER_CONSUMER_SECRET));
+			Configuration configuration = builder.build();
+			TwitterFactory factory = new TwitterFactory(configuration);
+			twitter = factory.getInstance();
+			
+			//twitter = TwitterFactory.getSingleton();
 			/*
 			 * System.out.println("TWITTER_CONSUMER_KEY: " +
 			 * getString(R.string.TWITTER_CONSUMER_KEY) +
 			 * ", TWITTER_CONSUMER_SECRET: " +
 			 * getString(R.string.TWITTER_CONSUMER_SECRET));
 			 */
-			twitter.setOAuthConsumer(getString(R.string.TWITTER_CONSUMER_KEY),
-					getString(R.string.TWITTER_CONSUMER_SECRET));
+			/*twitter.setOAuthConsumer(getString(R.string.TWITTER_CONSUMER_KEY),
+					getString(R.string.TWITTER_CONSUMER_SECRET));*/
 
 			try {
 				RequestToken requestToken = twitter
@@ -565,7 +596,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 				User user = twitter.showUser(userID);
 
-				StringBuilder userInfo = new StringBuilder("");
+				final StringBuilder userInfo = new StringBuilder("");
 
 				String userName = user.getName();
 				userInfo.append(String.format("Name: %s\n\n", userName));
@@ -585,6 +616,24 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 					public void run() {
 						// TODO Auto-generated method stub
 
+						Intent i = new Intent(MainActivity.this,
+								HomeScreenActivity.class);
+						i.putExtra("UserDetails", userInfo.toString());
+						startActivity(i);
+
+						if (shPrfs.contains(MainActivity.LOGIN_STATUS)) {
+							edit.remove(MainActivity.LOGIN_STATUS);
+							edit.remove(MainActivity.LOGIN_TYPE);
+							edit.putBoolean(MainActivity.LOGIN_STATUS, true);
+							edit.putString(MainActivity.LOGIN_TYPE, "twitter");
+							edit.commit();
+						} else {
+							edit.putBoolean(MainActivity.LOGIN_STATUS, true);
+							edit.putString(MainActivity.LOGIN_TYPE, "twitter");
+							edit.commit();
+						}
+						
+						finish();
 					}
 				});
 

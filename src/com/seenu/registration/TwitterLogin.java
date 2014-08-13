@@ -6,6 +6,8 @@ import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -142,7 +144,15 @@ public class TwitterLogin extends ActionBarActivity {
 
 		@Override
 		protected Void doInBackground(Void... voids) {
-			twitter = TwitterFactory.getSingleton();
+			
+			ConfigurationBuilder builder = new ConfigurationBuilder();
+			builder.setOAuthConsumerKey(getString(R.string.TWITTER_CONSUMER_KEY));
+			builder.setOAuthConsumerSecret(getString(R.string.TWITTER_CONSUMER_SECRET));
+			Configuration configuration = builder.build();
+			TwitterFactory factory = new TwitterFactory(configuration);
+			twitter = factory.getInstance();
+			
+			//twitter = TwitterFactory.getSingleton();
 			System.out.println("TWITTER_CONSUMER_KEY: "
 					+ getString(R.string.TWITTER_CONSUMER_KEY)
 					+ ", TWITTER_CONSUMER_SECRET: "

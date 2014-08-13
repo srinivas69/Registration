@@ -1,6 +1,8 @@
 package com.seenu.registration;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -25,6 +27,9 @@ public class RegisterActivity extends ActionBarActivity {
 
 	private String emailPattern = "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
+	private SharedPreferences sh_Pref;
+	private Editor edit;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -36,6 +41,10 @@ public class RegisterActivity extends ActionBarActivity {
 		emailEt = (EditText) findViewById(R.id.editText3);
 		pdEt = (EditText) findViewById(R.id.editText4);
 		regBt = (Button) findViewById(R.id.button1);
+
+		sh_Pref = getSharedPreferences(MainActivity.PREFERENCE_NAME,
+				MODE_PRIVATE);
+		edit = sh_Pref.edit();
 
 		fnEt.addTextChangedListener(textWatcher);
 		lnEt.addTextChangedListener(textWatcher);
@@ -59,6 +68,19 @@ public class RegisterActivity extends ActionBarActivity {
 							HomeScreenActivity.class);
 					i.putExtra("UserDetails", userDetails);
 					startActivity(i);
+
+					if (sh_Pref.contains(MainActivity.LOGIN_STATUS)) {
+						edit.remove(MainActivity.LOGIN_STATUS);
+						edit.remove(MainActivity.LOGIN_TYPE);
+						edit.putBoolean(MainActivity.LOGIN_STATUS, true);
+						edit.putString(MainActivity.LOGIN_TYPE, "register");
+						edit.commit();
+					} else {
+						edit.putBoolean(MainActivity.LOGIN_STATUS, true);
+						edit.putString(MainActivity.LOGIN_TYPE, "register");
+						edit.commit();
+					}
+
 					finish();
 				}
 			}
