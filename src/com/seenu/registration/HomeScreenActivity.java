@@ -60,14 +60,6 @@ public class HomeScreenActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 
-				/*
-				 * if (MainActivity.mGoogleApiClient.isConnected()) {
-				 * Plus.AccountApi
-				 * .clearDefaultAccount(MainActivity.mGoogleApiClient);
-				 * MainActivity.mGoogleApiClient.disconnect();
-				 * MainActivity.mGoogleApiClient.connect(); finish(); }
-				 */
-
 				if (sh_Pref.getString(MainActivity.LOGIN_TYPE, "none").equals(
 						"facebook")) {
 
