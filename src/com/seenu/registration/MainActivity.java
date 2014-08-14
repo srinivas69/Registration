@@ -82,12 +82,6 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 	private String TAG = "MainActivity";
 	private UiLifecycleHelper uiHelper;
 
-	// Internet Connection detector
-	private ConnectionDetector cd;
-
-	// Alert Dialog Manager
-	AlertDialogManager alert = new AlertDialogManager();
-
 	private SharedPreferences shPrfs;
 	private Editor edit;
 	public static String PREFERENCE_NAME = "MyPrefs";
