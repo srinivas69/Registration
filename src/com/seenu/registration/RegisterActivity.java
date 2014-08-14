@@ -29,12 +29,16 @@ public class RegisterActivity extends ActionBarActivity {
 
 	private SharedPreferences sh_Pref;
 	private Editor edit;
+	private DBAdapter db;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.registration_activity);
+
+		db = new DBAdapter(getApplicationContext());
+		db.openDatabase();
 
 		fnEt = (EditText) findViewById(R.id.editText1);
 		lnEt = (EditText) findViewById(R.id.editText2);
@@ -81,10 +85,20 @@ public class RegisterActivity extends ActionBarActivity {
 						edit.commit();
 					}
 
+					long insert = db.insertRecord(firstName + " " + lastName,
+							email, "N/A", "N/A", "N/A");
+
 					finish();
 				}
 			}
 		});
+	}
+	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		db.close();
 	}
 
 	protected String getUserDetails() {

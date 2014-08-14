@@ -94,6 +94,8 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 	public static String LOGIN_STATUS = "loginStatus";
 	public static String LOGIN_TYPE = "loginType";
 
+	private DBAdapter db;
+
 	private Session.StatusCallback callback = new Session.StatusCallback() {
 
 		@Override
@@ -129,18 +131,18 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 		setContentView(R.layout.activity_main);
 
+		db = new DBAdapter(getApplicationContext());
+		db.openDatabase();
+
 		reg_bt = (Button) findViewById(R.id.button1);
 		fbAuthButton = (LoginButton) findViewById(R.id.button2);
 
-		// fb_bt = (Button) findViewById(R.id.button2);
 		tw_bt = (Button) findViewById(R.id.button3);
-		// gp_bt = (Button) findViewById(R.id.button4);
 		googleSignIn = (SignInButton) findViewById(R.id.button4);
 
 		pDia = new ProgressDialog(MainActivity.this);
 
 		reg_bt.setOnClickListener(this);
-		// fb_bt.setOnClickListener(this);
 		tw_bt.setOnClickListener(this);
 		googleSignIn.setOnClickListener(this);
 
@@ -176,7 +178,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 	public void onDestroy() {
 		super.onDestroy();
 		uiHelper.onDestroy();
-
+		db.close();
 	}
 
 	@Override
@@ -453,16 +455,24 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 		StringBuilder userInfo = new StringBuilder("");
 
-		userInfo.append(String.format("Name: %s\n\n", user.getName()));
+		String name = user.getName();
+		userInfo.append(String.format("Name: %s\n\n", name));
 
-		userInfo.append(String.format("Gender: %s\n\n",
-				user.getProperty("gender")));
+		String accName = (String) ((user.getProperty("email") == null) ? "N/A"
+				: user.getProperty("email"));
+		userInfo.append(String.format("AccountName: %s\n\n", accName));
 
-		userInfo.append(String.format("Birthday: %s\n\n",
-				user.getProperty("birthday")));
+		String gender = (String) user.getProperty("gender");
+		userInfo.append(String.format("Gender: %s\n\n", gender));
 
-		userInfo.append(String.format("Locale: %s\n\n",
-				user.getProperty("locale")));
+		String dob = (String) user.getProperty("birthday");
+		userInfo.append(String.format("Birthday: %s\n\n", dob));
+
+		String locale = (String) user.getProperty("locale");
+		userInfo.append(String.format("Locale: %s\n\n", locale));
+
+		db.openDatabase();
+		long insert = db.insertRecord(name, accName, gender, dob, "N/A");
 
 		JSONArray languages = (JSONArray) user.getProperty("favorite_athletes");
 		if (languages.length() > 0) {
@@ -553,23 +563,25 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 		@Override
 		protected Void doInBackground(Void... voids) {
-			
+
 			ConfigurationBuilder builder = new ConfigurationBuilder();
 			builder.setOAuthConsumerKey(getString(R.string.TWITTER_CONSUMER_KEY));
 			builder.setOAuthConsumerSecret(getString(R.string.TWITTER_CONSUMER_SECRET));
 			Configuration configuration = builder.build();
 			TwitterFactory factory = new TwitterFactory(configuration);
 			twitter = factory.getInstance();
-			
-			//twitter = TwitterFactory.getSingleton();
+
+			// twitter = TwitterFactory.getSingleton();
 			/*
 			 * System.out.println("TWITTER_CONSUMER_KEY: " +
 			 * getString(R.string.TWITTER_CONSUMER_KEY) +
 			 * ", TWITTER_CONSUMER_SECRET: " +
 			 * getString(R.string.TWITTER_CONSUMER_SECRET));
 			 */
-			/*twitter.setOAuthConsumer(getString(R.string.TWITTER_CONSUMER_KEY),
-					getString(R.string.TWITTER_CONSUMER_SECRET));*/
+			/*
+			 * twitter.setOAuthConsumer(getString(R.string.TWITTER_CONSUMER_KEY),
+			 * getString(R.string.TWITTER_CONSUMER_SECRET));
+			 */
 
 			try {
 				RequestToken requestToken = twitter
@@ -632,7 +644,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 							edit.putString(MainActivity.LOGIN_TYPE, "twitter");
 							edit.commit();
 						}
-						
+
 						finish();
 					}
 				});

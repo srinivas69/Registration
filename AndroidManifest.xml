@@ -45,6 +45,7 @@
         <activity android:name="LoginToTwitter"></activity>
         <activity android:name="HomeScreenActivity"></activity>
         <activity android:name="RegisterActivity"></activity>
+        <activity android:name="UserListActivity"></activity>
     </application>
 
 </manifest>
