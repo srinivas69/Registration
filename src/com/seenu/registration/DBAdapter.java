@@ -77,6 +77,7 @@ public class DBAdapter {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			// TODO Auto-generated method stub
+//			create table 
 			db.execSQL(CREATE_TABLE);
 		}
 

@@ -321,7 +321,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		// TODO Auto-generated method stub
 
 		if (state.isOpened()) {
-			Log.i(TAG, "Logged in...");
+			// Log.i(TAG, "Logged in...");
 
 			Request.newMeRequest(session, new Request.GraphUserCallback() {
 
@@ -333,13 +333,14 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 						// Display the parsed user info
 						// String userDetails = buildUserInfoDisplay(user);
 						// System.out.println(user.toString());
+						;
 
 					}
 				}
 			}).executeAsync();
 
 		} else if (state.isClosed()) {
-			Log.i(TAG, "Logged out...");
+			// Log.i(TAG, "Logged out...");
 		}
 
 	}
@@ -349,7 +350,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		// TODO Auto-generated method stub
 
 		mSignInClicked = false;
-//		Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
+		// Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
 
 		// Get user's information
 
@@ -600,9 +601,6 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 				final String location = user.getLocation();
 				userInfo.append(String.format("Location: %s\n\n", location));
 
-				// System.out.println(userName);
-				// System.out.println(userId);
-
 				runOnUiThread(new Runnable() {
 
 					@Override
@@ -627,8 +625,8 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 						}
 
 						db.openDatabase();
-						long insert = db.insertRecord(userName, userId, "N/A",
-								"N/A", location);
+						db.insertRecord(userName, userId, "N/A", "N/A",
+								location);
 						db.close();
 
 						finish();

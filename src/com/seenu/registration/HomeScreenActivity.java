@@ -111,6 +111,7 @@ public class HomeScreenActivity extends ActionBarActivity {
 		db.close();
 	}
 
+	// user details method
 	private String getUserDetails() {
 		// TODO Auto-generated method stub
 
