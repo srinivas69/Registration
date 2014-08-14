@@ -61,6 +61,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 	private static Twitter twitter;
 
+	// Twitter variables
 	protected static final String AUTHENTICATION_URL_KEY = "AUTHENTICATION_URL_KEY";
 	protected static final int LOGIN_TO_TWITTER_REQUEST = 1;
 
@@ -82,12 +83,14 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 	private String TAG = "MainActivity";
 	private UiLifecycleHelper uiHelper;
 
+	// declaring shared prefernece for Login
 	private SharedPreferences shPrfs;
 	private Editor edit;
 	public static String PREFERENCE_NAME = "MyPrefs";
 	public static String LOGIN_STATUS = "loginStatus";
 	public static String LOGIN_TYPE = "loginType";
 
+	// creating instance of database
 	private DBAdapter db;
 
 	private Session.StatusCallback callback = new Session.StatusCallback() {
@@ -328,7 +331,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 					if (user != null) {
 						// Display the parsed user info
-						String userDetails = buildUserInfoDisplay(user);
+						// String userDetails = buildUserInfoDisplay(user);
 						// System.out.println(user.toString());
 
 					}
@@ -346,7 +349,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		// TODO Auto-generated method stub
 
 		mSignInClicked = false;
-		Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
+//		Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
 
 		// Get user's information
 
