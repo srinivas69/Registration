@@ -206,6 +206,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 		case R.id.button1:
 
+			// Navigate to REgistration activity
 			Intent i = new Intent(MainActivity.this, RegisterActivity.class);
 			startActivity(i);
 
@@ -214,19 +215,13 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		case R.id.button3:
 
 			loginToTwitter();
-			/*
-			 * Intent i2 = new Intent(MainActivity.this, TwitterLogin.class);
-			 * startActivity(i2);
-			 */
 
 			break;
 
 		case R.id.button4:
 
-			// Signin button clicked
-
-			new SingInGPlusAsync().execute();
-			// signInWithGplus();
+			// new SingInGPlusAsync().execute();
+			signInWithGplus();
 
 			break;
 
@@ -245,10 +240,6 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		/*
-		 * Session.getActiveSession().onActivityResult(this, requestCode,
-		 * resultCode, data);
-		 */
 
 		switch (requestCode) {
 
@@ -315,6 +306,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 			if (!mGoogleApiClient.isConnecting()) {
 				mGoogleApiClient.connect();
 			}
+
 			break;
 
 		case LOGIN_TO_TWITTER_REQUEST:
@@ -345,11 +337,6 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 						String userDetails = buildUserInfoDisplay(user);
 						// System.out.println(user.toString());
 
-						/*
-						 * Intent i = new Intent(MainActivity.this,
-						 * HomeScreenActivity.class); i.putExtra("UserDetails",
-						 * userDetails); startActivity(i); finish();
-						 */
 					}
 				}
 			}).executeAsync();
@@ -368,12 +355,14 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
 
 		// Get user's information
-		String userDetails = getProfileInformation();
 
 		/*
+		 * String userDetails = getProfileInformation();
+		 * 
 		 * Intent i = new Intent(MainActivity.this, HomeScreenActivity.class);
 		 * i.putExtra("UserDetails", userDetails); startActivity(i); finish();
 		 */
+
 	}
 
 	@Override
@@ -434,6 +423,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		getRequestTokenTask.execute();
 	}
 
+	// Twiter : call activity twitter login webview
 	public void launchLoginWebView(RequestToken requestToken) {
 		// TODO Auto-generated method stub
 		Intent intent = new Intent(this, LoginToTwitter.class);
@@ -450,6 +440,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		getAccessTokenTask.execute(verifier);
 	}
 
+	// Facebook : get profile information for the logged-in user
 	protected String buildUserInfoDisplay(GraphUser user) {
 		// TODO Auto-generated method stub
 
@@ -473,6 +464,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 		db.openDatabase();
 		long insert = db.insertRecord(name, accName, gender, dob, "N/A");
+		db.close();
 
 		JSONArray languages = (JSONArray) user.getProperty("favorite_athletes");
 		if (languages.length() > 0) {
@@ -490,6 +482,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		return userInfo.toString();
 	}
 
+	// access profile information for Google Plus after Connect.
 	private String getProfileInformation() {
 		// TODO Auto-generated method stub
 
@@ -559,6 +552,8 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 	}
 
+	// Twwitter : Get AccessToken after login to the Registration Test twitter
+	// app
 	private class GetRequestTokenTask extends AsyncTask<Void, Void, Void> {
 
 		@Override
@@ -571,18 +566,6 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 			TwitterFactory factory = new TwitterFactory(configuration);
 			twitter = factory.getInstance();
 
-			// twitter = TwitterFactory.getSingleton();
-			/*
-			 * System.out.println("TWITTER_CONSUMER_KEY: " +
-			 * getString(R.string.TWITTER_CONSUMER_KEY) +
-			 * ", TWITTER_CONSUMER_SECRET: " +
-			 * getString(R.string.TWITTER_CONSUMER_SECRET));
-			 */
-			/*
-			 * twitter.setOAuthConsumer(getString(R.string.TWITTER_CONSUMER_KEY),
-			 * getString(R.string.TWITTER_CONSUMER_SECRET));
-			 */
-
 			try {
 				RequestToken requestToken = twitter
 						.getOAuthRequestToken(getString(R.string.TWITTER_CALLBACK_URL));
@@ -594,6 +577,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 		}
 	}
 
+	// Twitter : get profile info for accesToken that is been fetched
 	private class GetAccessTokenTask extends AsyncTask<String, Void, Void> {
 
 		@Override
@@ -610,17 +594,17 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 
 				final StringBuilder userInfo = new StringBuilder("");
 
-				String userName = user.getName();
+				final String userName = user.getName();
 				userInfo.append(String.format("Name: %s\n\n", userName));
 
-				String userId = user.getScreenName();
+				final String userId = user.getScreenName();
 				userInfo.append(String.format("AccountName: %s\n\n", userId));
 
-				String location = user.getLocation();
+				final String location = user.getLocation();
 				userInfo.append(String.format("Location: %s\n\n", location));
 
-				System.out.println(userName);
-				System.out.println(userId);
+				// System.out.println(userName);
+				// System.out.println(userId);
 
 				runOnUiThread(new Runnable() {
 
@@ -644,6 +628,11 @@ public class MainActivity extends ActionBarActivity implements OnClickListener,
 							edit.putString(MainActivity.LOGIN_TYPE, "twitter");
 							edit.commit();
 						}
+
+						db.openDatabase();
+						long insert = db.insertRecord(userName, userId, "N/A",
+								"N/A", location);
+						db.close();
 
 						finish();
 					}

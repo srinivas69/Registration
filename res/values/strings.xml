@@ -6,7 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="register">Register</string>
     <string name="register_facebook">Register with Facebook</string>
-    <string name="register_twitter">Register with Twitter</string>
+    <string name="register_twitter">Signin with Twitter</string>
     <string name="register_google">Register with Google+</string>
     <string name="facebook_app_id">796722137015397</string>
 

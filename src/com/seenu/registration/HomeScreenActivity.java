@@ -133,10 +133,10 @@ public class HomeScreenActivity extends ActionBarActivity {
 		String gender = c.getString(3);
 		userInfo.append(String.format("Gender: %s\n\n", gender));
 
-		String dob = c.getString(3);
+		String dob = c.getString(4);
 		userInfo.append(String.format("Date of Birth: %s\n\n", dob));
 
-		String location = c.getString(4);
+		String location = c.getString(5);
 		userInfo.append(String.format("Location: %s\n\n", location));
 
 		return userInfo.toString();
